@@ -31,55 +31,35 @@ public class WebSecurityConfig {
 	private GatewayHeaderFilter gatewayHeaderFilter;
 
 	@Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authenticationConfiguration
-    ) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
-    
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+			throws Exception {
+		return authenticationConfiguration.getAuthenticationManager();
+	}
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http
-		.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-		.csrf(csrf -> csrf.disable())
-		.exceptionHandling(exceptionHandling ->
-        exceptionHandling.accessDeniedHandler((request, response, accessDeniedException) -> {
-  
-        		ApiResponse apiResponse = new ApiResponse("Access Denied: You do not have permission to access this resource.", HttpServletResponse.SC_FORBIDDEN);
-        		
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN); 
-                response.setContentType("application/json");
-                response.getWriter().write(apiResponse.toString());
-            })                        
-        )
+		http.cors(cors -> cors.configurationSource(corsConfigurationSource())).csrf(csrf -> csrf.disable())
 				.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(authorizeRequests -> authorizeRequests
-						.requestMatchers(
-					              "/v3/api-docs/**",
-					              "/swagger-ui.html",
-					              "/swagger-ui/**",
-					              "/swagger-ui/index.html",
-					              "/swagger-resources/**",
-					              "/webjars/**"
-					          ).permitAll()
-						.requestMatchers("/customer/**").permitAll())
+						.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**",
+								"/swagger-ui/index.html", "/swagger-resources/**", "/webjars/**")
+						.permitAll().requestMatchers("/customer/**").permitAll())
 				.addFilterBefore(gatewayHeaderFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
 	}
-	
-	@Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:8080"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // apply to all paths
-        source.registerCorsConfiguration("/**", config);
-        return source;
-    }
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration config = new CorsConfiguration();
+		config.setAllowedOrigins(List.of("http://localhost:8080"));
+		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		config.setAllowedHeaders(List.of("*"));
+		config.setAllowCredentials(true);
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		// apply to all paths
+		source.registerCorsConfiguration("/**", config);
+		return source;
+	}
 }
