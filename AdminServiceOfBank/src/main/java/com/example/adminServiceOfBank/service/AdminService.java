@@ -211,7 +211,7 @@ public class AdminService {
 
 		// Sending welcome email
 		Mail mail = new Mail();
-		mail.setFrom(new Email("sharmaprishita10@gmail.com", "GenieBank"));
+		mail.setFrom(new Email("ps@gmail.com", "GenieBank"));
 		mail.setTemplateId(TEMPLATE_ID);
 
 		Personalization personalization = new Personalization();
